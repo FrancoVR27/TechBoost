@@ -6,7 +6,20 @@ import { Empresa } from './empresas.entity.js';
 
 @Injectable()
 export class EmpresasService extends CrudService<Empresa> {
-  constructor(@InjectRepository(Empresa) repository: Repository<Empresa>) {
-    super(repository);
+  constructor(
+    @InjectRepository(Empresa)
+    private readonly empresaRepo: Repository<Empresa>,
+  ) {
+    super(empresaRepo);
+  }
+
+  async listarParaUsuario(usuarioId: string, rol: string): Promise<Empresa[]> {
+    if (rol === 'Admin') {
+      return this.empresaRepo.find({ order: { fechaCreacion: 'DESC' } });
+    }
+    return this.empresaRepo.find({
+      where: { clienteId: usuarioId },
+      order: { fechaCreacion: 'DESC' },
+    });
   }
 }

@@ -7,8 +7,9 @@ import "./auth/auth.css";
 import { chainStages } from "./data/chainStages";
 import { FinanceDemo } from "./components/FinanceDemo";
 import { Icon } from "./components/Icon";
+import { CompaniesPage } from "./components/CompaniesPage";
+import { AiAndChatPanel } from "./components/AiAndChatPanel";
 import "./App.css";
-
 
 const productiveServices = [
   {
@@ -102,6 +103,7 @@ function Header({ financeActive }: { financeActive: boolean }) {
           <a href="#empresa">Empresa</a>
           <a href="#servicios">Servicios</a>
           <a href="#cadena">Cadena de valor</a>
+          <a href="#empresas">Empresas</a>
           <a href="#finanzas" className="nav-finance"><Icon name="lock" size={14} /> Finanzas</a>
         </nav>
         <a className="button button-small button-primary header-cta" href="#login">Iniciar sesión <Icon name="arrow" size={15} /></a>
@@ -362,26 +364,45 @@ function AppContent() {
   const [financeActive, setFinanceActive] = useState(window.location.hash === "#finanzas");
   const [loginActive, setLoginActive] = useState(window.location.hash === "#login");
   const [demoActive, setDemoActive] = useState(false);
+  const [companiesActive, setCompaniesActive] = useState(window.location.hash === "#empresas");
+  const [aiChatActive, setAiChatActive] = useState(window.location.hash.startsWith("#ia-chat/"));
+  const aiEmpresaId = aiChatActive ? window.location.hash.replace("#ia-chat/", "") : null;
 
   useEffect(() => {
     const handleHash = () => {
       const hash = window.location.hash;
+      const isCompanies = hash === "#empresas";
+      const isAiChat = hash.startsWith("#ia-chat/");
+
       setFinanceActive(hash === "#finanzas");
       setLoginActive(hash === "#login");
+      setCompaniesActive(isCompanies);
+      setAiChatActive(isAiChat);
       setDemoActive(false);
-      if (hash && hash !== "#finanzas" && hash !== "#login") {
+
+      if (hash && hash !== "#finanzas" && hash !== "#login" && !isCompanies && !isAiChat) {
         window.setTimeout(() => {
           document.getElementById(hash.slice(1))?.scrollIntoView({ behavior: "smooth", block: "start" });
         }, 80);
-      } else if (!hash) {
+      } else if (!hash || isCompanies || isAiChat) {
         window.scrollTo({ top: 0, behavior: "smooth" });
       }
     };
+
     window.addEventListener("hashchange", handleHash);
-    if (window.location.hash && window.location.hash !== "#finanzas" && window.location.hash !== "#login") {
-      const target = document.getElementById(window.location.hash.slice(1));
+
+    const initialHash = window.location.hash;
+    if (
+      initialHash &&
+      initialHash !== "#finanzas" &&
+      initialHash !== "#login" &&
+      initialHash !== "#empresas" &&
+      !initialHash.startsWith("#ia-chat/")
+    ) {
+      const target = document.getElementById(initialHash.slice(1));
       if (target) window.setTimeout(() => target.scrollIntoView({ behavior: "smooth", block: "start" }), 100);
     }
+
     return () => window.removeEventListener("hashchange", handleHash);
   }, []);
 
@@ -395,16 +416,47 @@ function AppContent() {
   return (
     <>
       <Header financeActive={financeActive} />
-      {financeActive && user && (
+      {(financeActive || companiesActive || aiChatActive) && user && (
         <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", gap: 14, padding: "12px 5%", background: "#f4f6f8" }}>
           <span>{user.nombre} {user.apellido} · {user.rol}</span>
           <button type="button" className="button button-outline" onClick={logout}>Cerrar sesión</button>
         </div>
       )}
-      {financeActive ? (
-        loading ? <p style={{ padding: 32 }}>Verificando sesión…</p>
-          : !user ? <LoginPage />
-          : demoActive ? <FinanceDemo onExit={exitFinance} /> : <FinanceAccessGate onDemo={() => setDemoActive(true)} />
+      {companiesActive ? (
+        loading ? (
+          <p style={{ padding: 32 }}>Verificando sesión…</p>
+        ) : !user ? (
+          <LoginPage />
+        ) : (
+          <CompaniesPage
+            onSelectEmpresa={(emp) => {
+              window.location.hash = `#ia-chat/${emp.empresaId}`;
+            }}
+          />
+        )
+      ) : aiChatActive && aiEmpresaId ? (
+        loading ? (
+          <p style={{ padding: 32 }}>Verificando sesión…</p>
+        ) : !user ? (
+          <LoginPage />
+        ) : (
+          <AiAndChatPanel
+            empresaId={aiEmpresaId}
+            onBack={() => {
+              window.location.hash = "#empresas";
+            }}
+          />
+        )
+      ) : financeActive ? (
+        loading ? (
+          <p style={{ padding: 32 }}>Verificando sesión…</p>
+        ) : !user ? (
+          <LoginPage />
+        ) : demoActive ? (
+          <FinanceDemo onExit={exitFinance} />
+        ) : (
+          <FinanceAccessGate onDemo={() => setDemoActive(true)} />
+        )
       ) : loginActive ? (
         <main className="login-route">
           <LoginPage />
