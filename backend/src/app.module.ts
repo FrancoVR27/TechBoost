@@ -4,6 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller.js';
 import { AuthModule } from './auth/auth.module.js';
 import { DatabaseApiModule } from './database-api.module.js';
+import { FinanceModule } from './finance/finance.module.js';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { DatabaseApiModule } from './database-api.module.js';
     }),
     AuthModule,
     DatabaseApiModule,
+    FinanceModule,
   ],
 
   controllers: [AppController],

@@ -6,6 +6,7 @@ import { useAuth } from "./auth/useAuth";
 import "./auth/auth.css";
 import { chainStages } from "./data/chainStages";
 import { FinanceDemo } from "./components/FinanceDemo";
+import { FinancePanel } from "./components/FinancePanel";
 import { Icon } from "./components/Icon";
 import "./App.css";
 
@@ -340,19 +341,20 @@ function Footer() {
   );
 }
 
-function FinanceAccessGate({ onDemo }: { onDemo: () => void }) {
+function FinanceAccessGate({ onDemo, onReal }: { onDemo: () => void; onReal: () => void }) {
   return (
     <main className="finance-gate">
       <div className="finance-gate-card">
         <div className="gate-lock"><Icon name="lock" size={27} /></div>
         <span className="eyebrow">ÁREA PRIVADA</span>
         <h1>Finanzas de tu empresa.</h1>
-        <p>Has iniciado sesión. El panel financiero debe mostrar únicamente la información autorizada para tu cuenta. La validación definitiva de roles y permisos debe realizarse también en el servidor.</p>
+        <p>Has iniciado sesión. El panel financiero muestra únicamente la información asociada a tu cuenta. La validación de roles y permisos se mantiene en el servidor.</p>
         <div className="gate-status"><span className="status-dot" /><div><strong>Sesión autenticada</strong><small>Acceso protegido por el sistema de autenticación de TECH BOOST.</small></div></div>
-        <button className="button button-primary button-wide" type="button" onClick={onDemo}>Ver demostración con datos ficticios <Icon name="arrow" size={16} /></button>
+        <button className="button button-primary button-wide" type="button" onClick={onReal}>Ver datos reales desde PostgreSQL <Icon name="arrow" size={16} /></button>
+        <button className="button button-outline button-wide" type="button" onClick={onDemo}>Ver demostración con datos ficticios <Icon name="arrow" size={16} /></button>
         <a className="text-button gate-back" href="#inicio">Volver a la presentación pública</a>
       </div>
-      <div className="gate-side-note"><Icon name="shield" size={18} /><span>Los datos financieros reales no se muestran ni se simulan como si estuvieran conectados a la base de datos.</span></div>
+      <div className="gate-side-note"><Icon name="shield" size={18} /><span>El modo real consulta la base de datos con tu sesión; el modo demostración usa datos ficticios en memoria.</span></div>
     </main>
   );
 }
@@ -362,6 +364,7 @@ function AppContent() {
   const [financeActive, setFinanceActive] = useState(window.location.hash === "#finanzas");
   const [loginActive, setLoginActive] = useState(window.location.hash === "#login");
   const [demoActive, setDemoActive] = useState(false);
+  const [realActive, setRealActive] = useState(false);
 
   useEffect(() => {
     const handleHash = () => {
@@ -369,6 +372,7 @@ function AppContent() {
       setFinanceActive(hash === "#finanzas");
       setLoginActive(hash === "#login");
       setDemoActive(false);
+      setRealActive(false);
       if (hash && hash !== "#finanzas" && hash !== "#login") {
         window.setTimeout(() => {
           document.getElementById(hash.slice(1))?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -389,6 +393,7 @@ function AppContent() {
     setFinanceActive(false);
     setLoginActive(false);
     setDemoActive(false);
+    setRealActive(false);
     window.location.hash = "#inicio";
   }
 
@@ -404,7 +409,12 @@ function AppContent() {
       {financeActive ? (
         loading ? <p style={{ padding: 32 }}>Verificando sesión…</p>
           : !user ? <LoginPage />
-          : demoActive ? <FinanceDemo onExit={exitFinance} /> : <FinanceAccessGate onDemo={() => setDemoActive(true)} />
+          : realActive ? <FinancePanel onExit={exitFinance} />
+          : demoActive ? <FinanceDemo onExit={exitFinance} />
+          : <FinanceAccessGate
+              onReal={() => { setDemoActive(false); setRealActive(true); }}
+              onDemo={() => { setRealActive(false); setDemoActive(true); }}
+            />
       ) : loginActive ? (
         <main className="login-route">
           <LoginPage />
