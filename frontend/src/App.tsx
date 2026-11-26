@@ -28,38 +28,38 @@ import "./App.css";
 const productiveServices = [
   {
     title: "Análisis y digitalización de procesos",
-    description: "Levantamos cómo trabaja el taller, qué etapas sigue y dónde se pierde tiempo o información. El empresario obtiene una visión clara de su operación.",
-    result: "Procesos documentados y oportunidades de mejora.",
+    description: "Mapeamos tareas, responsables y datos que hoy se pierden.",
+    result: "Procesos claros y mejoras priorizadas.",
     status: "Punto de partida",
   },
   {
     title: "Optimización de la cadena de valor",
-    description: "Identificamos esperas, reprocesos, cuellos de botella y actividades que no agregan valor para ordenar mejor el flujo de producción.",
-    result: "Menos retrasos y mejor coordinación entre etapas.",
+    description: "Detectamos esperas, reprocesos y cuellos de botella.",
+    result: "Un flujo de producción más ordenado.",
     status: "Punto de partida",
   },
   {
     title: "Control de materias primas y producción",
-    description: "Relacionamos materiales, modelos, órdenes y etapas para comparar lo planificado con lo realmente consumido y producido.",
-    result: "Mayor control de insumos, lotes y desperdicios.",
+    description: "Comparamos materiales y producción planificados con los reales.",
+    result: "Menos desperdicio y faltantes.",
     status: "Base de gestión",
   },
   {
     title: "Monitoreo de maquinaria con IoT",
-    description: "Sensores y dispositivos pueden registrar variables de operación para detectar condiciones anormales y advertir sobre posibles paradas.",
-    result: "Más visibilidad sobre el estado de los equipos.",
+    description: "Monitoreamos equipos con sensores compatibles cuando se necesitan.",
+    result: "Alertas y visibilidad del estado de los equipos.",
     status: "V1 · según diagnóstico",
   },
   {
     title: "Mantenimiento predictivo con IA",
-    description: "El análisis de datos de funcionamiento puede ayudar a reconocer patrones asociados a fallas y planificar intervenciones antes de una parada.",
-    result: "Mantenimiento planificado y menos interrupciones imprevistas.",
+    description: "Analizamos patrones de fallas cuando existen datos suficientes.",
+    result: "Mantenimiento planificado en fases posteriores.",
     status: "Fase posterior",
   },
   {
     title: "Calidad y productividad",
-    description: "Registramos defectos, reprocesos, tiempos y rendimiento. La visión artificial puede incorporarse cuando el proceso y los datos lo permitan.",
-    result: "Indicadores para mejorar la calidad y la productividad.",
+    description: "Seguimos defectos, reprocesos y tiempos por etapa.",
+    result: "Indicadores de calidad y productividad.",
     status: "Análisis base · visión artificial posterior",
   },
 ];
@@ -67,61 +67,95 @@ const productiveServices = [
 const adminServices = [
   {
     title: "Finanzas y costos",
-    description: "Organizamos ingresos, egresos, costos fijos y variables, costos por producto y flujo de caja para que el dueño sepa cuánto cuesta producir y cuánto queda.",
-    result: "Decisiones de precio y planificación con datos.",
+    description: "Ordenamos ingresos, egresos, costos y flujo de caja.",
+    result: "Conocer el costo real y el margen.",
     status: "Módulo de este desarrollo",
   },
   {
     title: "Compras e inventarios",
-    description: "Relacionamos el consumo de materiales con la producción y ayudamos a planificar reposiciones según existencias y necesidades.",
-    result: "Menos compras urgentes y menos faltantes.",
+    description: "Vinculamos existencias con el consumo de producción.",
+    result: "Reposiciones más oportunas.",
     status: "Integración modular",
   },
   {
     title: "Marketing e inteligencia de mercados",
-    description: "La plataforma puede organizar información de clientes, mercado potencial, competencia y canales de venta para orientar acciones comerciales.",
-    result: "Mejor conocimiento del mercado y de las oportunidades.",
+    description: "Organizamos clientes, competencia y oportunidades comerciales.",
+    result: "Acciones de venta mejor enfocadas.",
     status: "Módulo de otra área del equipo",
   },
   {
     title: "Gestión de personas y destajo",
-    description: "Permite estructurar información del personal y relacionar las unidades producidas con los pagos acordados por trabajo a destajo.",
-    result: "Mayor claridad sobre producción y pagos.",
+    description: "Relacionamos unidades producidas con los pagos acordados.",
+    result: "Claridad sobre producción y pagos.",
     status: "Módulo de otra área del equipo",
   },
   {
     title: "Análisis de información empresarial",
-    description: "Reúne datos de operación y administración en indicadores sencillos para revisar tendencias, costos y desempeño del negocio.",
-    result: "Una visión integral para tomar decisiones.",
+    description: "Reunimos indicadores de operación y administración.",
+    result: "Una visión integral para decidir.",
     status: "Integración progresiva",
   },
 ];
 
 const riskItems = [
-  ["Desperdicio de materia prima", "Comparar consumo previsto y real por modelo o lote para localizar dónde se pierde material."],
-  ["Retrasos entre etapas", "Registrar tiempos y órdenes pendientes para reconocer acumulaciones y cuellos de botella."],
-  ["Maquinaria detenida", "Documentar paradas y, cuando existan sensores compatibles, monitorear variables para anticipar fallas."],
-  ["Defectos de fabricación", "Registrar defectos y reprocesos por etapa para identificar causas recurrentes."],
-  ["Costos de mano de obra elevados", "Relacionar unidades, tiempos y pagos a destajo sin duplicar los importes en los costos."],
-  ["Falta de materiales", "Comparar recetas, órdenes y existencias para anticipar necesidades de compra."],
-  ["Mala planificación de pedidos", "Organizar órdenes y capacidad por etapa para programar lotes y fechas de entrega."],
+  ["Desperdicio de materia prima", "Comparamos consumo previsto y real por lote."],
+  ["Retrasos entre etapas", "Ubicamos órdenes detenidas y cuellos de botella."],
+  ["Maquinaria detenida", "Registramos paradas y monitoreamos equipos compatibles."],
+  ["Defectos de fabricación", "Seguimos defectos y reprocesos por etapa."],
+  ["Costos de mano de obra", "Relacionamos unidades producidas y pagos a destajo."],
+  ["Falta de materiales", "Contrastamos existencias con las necesidades de producción."],
+  ["Pedidos mal planificados", "Organizamos órdenes, capacidad y fechas de entrega."],
 ];
 
-function Header({ financeActive }: { financeActive: boolean }) {
+function Header({
+  financeActive,
+  loading,
+  user,
+  onLogout,
+}: {
+  financeActive: boolean;
+  loading: boolean;
+  user: { nombre: string; apellido: string; rol: string } | null;
+  onLogout: () => void;
+}) {
+  const hash = window.location.hash;
+  const activeHash = hash.startsWith("#ia-chat/") ? "#empresas" : hash || "#inicio";
+
   return (
     <header className="site-header">
       <div className="header-inner">
         <Brand />
         <nav className="main-nav" aria-label="Navegación principal">
-          <a href="#inicio" className={!financeActive ? "nav-public" : ""}>Inicio</a>
-          <a href="#empresa">Empresa</a>
-          <a href="#servicios">Servicios</a>
-          <a href="#cadena">Cadena de valor</a>
-          <a href="#empresas">Empresas</a>
-          <a href="#panel-empresarial">Panel empresarial</a>
-          <a href="#finanzas" className="nav-finance"><Icon name="lock" size={14} /> Finanzas</a>
+          <a href="#inicio" className={activeHash === "#inicio" ? "nav-active" : undefined} aria-current={activeHash === "#inicio" ? "page" : undefined}>Inicio</a>
+          <a href="#empresa" className={activeHash === "#empresa" ? "nav-active" : undefined} aria-current={activeHash === "#empresa" ? "page" : undefined}>Empresa</a>
+          <a href="#transformacion" className={activeHash === "#transformacion" ? "nav-active" : undefined} aria-current={activeHash === "#transformacion" ? "page" : undefined}>Antes y después</a>
+          <a href="#servicios" className={activeHash === "#servicios" ? "nav-active" : undefined} aria-current={activeHash === "#servicios" ? "page" : undefined}>Servicios</a>
+          <a href="#cadena" className={activeHash === "#cadena" ? "nav-active" : undefined} aria-current={activeHash === "#cadena" ? "page" : undefined}>Cadena de valor</a>
+          <a href="#empresas" className={activeHash === "#empresas" ? "nav-active" : undefined} aria-current={activeHash === "#empresas" ? "page" : undefined}>Empresas</a>
+          <a href="#panel-empresarial" className={activeHash === "#panel-empresarial" ? "nav-active" : undefined} aria-current={activeHash === "#panel-empresarial" ? "page" : undefined}>Panel empresarial</a>
+          <a href="#finanzas" className={`nav-finance ${financeActive ? "nav-active" : ""}`} aria-current={financeActive ? "page" : undefined}><Icon name="lock" size={14} /> Finanzas</a>
         </nav>
-        <a className="button button-small button-primary header-cta" href="#login">Iniciar sesión <Icon name="arrow" size={15} /></a>
+        <div className="header-actions">
+          {loading ? (
+            <span className="account-loading" role="status">Verificando cuenta…</span>
+          ) : user ? (
+            <>
+              <div className="account-status" aria-label={`Cuenta activa: ${user.nombre} ${user.apellido}`}>
+                <span className="account-status-dot" />
+                <span className="account-status-copy">
+                  <small>Cuenta activa</small>
+                  <strong>{user.nombre} {user.apellido}</strong>
+                </span>
+              </div>
+              <button className="header-logout" type="button" onClick={onLogout} title="Cerrar sesión">
+                <span className="logout-full-label">Cerrar sesión</span>
+                <span className="logout-compact-label" aria-hidden="true">Salir</span>
+              </button>
+            </>
+          ) : (
+            <a className="button button-small button-primary header-cta" href="#login">Iniciar sesión <Icon name="arrow" size={15} /></a>
+          )}
+        </div>
       </div>
     </header>
   );
@@ -175,8 +209,8 @@ function CompanySection() {
         <div className="container">
           <div className="section-heading centered">
             <span className="eyebrow">QUIÉNES SOMOS</span>
-            <h2>La tecnología debe resolver problemas reales de producción.</h2>
-            <p>TECH BOOST es una empresa de base tecnológica del sector cuaternario. Integramos conocimiento, datos e inteligencia artificial para apoyar la transformación de negocios productivos.</p>
+            <h2>Tecnología práctica para mejorar negocios productivos.</h2>
+            <p>TECH BOOST digitaliza la producción y su gestión: diagnostica cada negocio, organiza sus datos e implementa herramientas para controlar y mejorar.</p>
           </div>
           <div className="mission-grid">
             <article className="mission-card mission-card-dark">
@@ -187,7 +221,7 @@ function CompanySection() {
             <article className="mission-card mission-card-light">
               <span className="card-kicker">NUESTRA VISIÓN</span>
               <div className="mission-icon mission-icon-orange"><Icon name="trend" size={23} /></div>
-              <h3>Ser la plataforma de referencia en Bolivia y Latinoamérica para la transformación eficiente e inteligente de negocios e industrias, y contribuir al desarrollo de la economía nacional.</h3>
+              <h3>Ser lideres en Bolivia para la transformacion inteligente de Industrias. Y contribuir al Desarrollo economico</h3>
             </article>
           </div>
           <div className="problem-solution">
@@ -220,6 +254,9 @@ function CompanySection() {
             <div><span className="value-icon"><Icon name="chart" /></span><b>Medible</b><small>Información para revisar resultados.</small></div>
             <div><span className="value-icon"><Icon name="leaf" /></span><b>Eficiente</b><small>Menos desperdicio y mejor uso de recursos.</small></div>
           </div>
+          <div className="company-transform-link">
+            <a className="button button-primary" href="#transformacion">Ver el antes y después <Icon name="arrow" size={16} /></a>
+          </div>
         </div>
       </section>
       <section className="audience-band">
@@ -231,6 +268,69 @@ function CompanySection() {
         </div>
       </section>
     </>
+  );
+}
+
+function TransformationSection() {
+  return (
+    <section className="transformation-section" id="transformacion" aria-labelledby="transformation-title">
+      <div className="container">
+        <div className="section-heading centered transformation-heading">
+          <span className="eyebrow eyebrow-light">DEL SECTOR SECUNDARIO AL CUATERNARIO</span>
+          <h2 id="transformation-title">La PYME sigue fabricando. Ahora también decide con datos.</h2>
+          <p>Una empresa manufacturera no deja de pertenecer al sector secundario. Al sumar software, análisis e inteligencia artificial, incorpora capacidades del sector cuaternario.</p>
+        </div>
+        <div className="transformation-grid">
+          <article className="transformation-card">
+            <div className="transformation-image">
+              <img
+                src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&w=1400&q=85"
+                alt="Operario trabajando con una pieza metálica en un taller"
+                loading="lazy"
+                decoding="async"
+              />
+              <span className="transformation-label">HOY · PRODUCCIÓN</span>
+            </div>
+            <div className="transformation-copy">
+              <span className="transformation-sector">SECTOR SECUNDARIO</span>
+              <h3>El oficio transforma materiales en productos.</h3>
+              <ul>
+                <li>Conocimiento del proceso en las personas.</li>
+                <li>Registros dispersos y control manual.</li>
+                <li>Problemas detectados cuando ya afectan la entrega.</li>
+              </ul>
+            </div>
+          </article>
+          <div className="transformation-bridge" aria-label="TECH BOOST conecta producción y datos">
+            <span className="bridge-mark">TB</span>
+            <Icon name="arrow" size={22} />
+            <strong>TECH BOOST</strong>
+            <small>diagnóstico · datos · tecnología</small>
+          </div>
+          <article className="transformation-card transformation-card-after">
+            <div className="transformation-image">
+              <img
+                src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=1400&q=85"
+                alt="Profesional usando una computadora junto a maquinaria industrial"
+                loading="lazy"
+                decoding="async"
+              />
+              <span className="transformation-label">CON TECH BOOST · PRODUCCIÓN CONECTADA</span>
+            </div>
+            <div className="transformation-copy">
+              <span className="transformation-sector">CAPACIDADES DEL SECTOR CUATERNARIO</span>
+              <h3>Los datos ayudan a planificar y mejorar.</h3>
+              <ul>
+                <li>Procesos, materiales y costos organizados.</li>
+                <li>Indicadores para anticipar y priorizar.</li>
+                <li>IA e IoT cuando hay datos y aportan valor.</li>
+              </ul>
+            </div>
+          </article>
+        </div>
+        <p className="transformation-note">La tecnología acompaña el trabajo productivo; no reemplaza el oficio. Imágenes ilustrativas de Unsplash, no de empresas identificadas.</p>
+      </div>
+    </section>
   );
 }
 
@@ -251,13 +351,13 @@ function ServicesSection() {
       <div className="container">
         <div className="section-heading">
           <span className="eyebrow">QUÉ HACEMOS</span>
-          <h2>Dos áreas de trabajo, una sola visión del negocio.</h2>
-          <p>No ofrecemos herramientas aisladas. Relacionamos el funcionamiento de la planta con la administración para que la información sea útil en las decisiones diarias.</p>
+          <h2>Producción y gestión conectadas en una sola plataforma.</h2>
+          <p>Registramos lo que ocurre, detectamos oportunidades y aplicamos mejoras con datos del negocio.</p>
         </div>
         <div className="service-group">
           <div className="service-group-heading">
             <div className="service-group-icon"><Icon name="factory" size={24} /></div>
-            <div><span className="eyebrow">ÁREA A</span><h3>Optimización del sistema productivo</h3><p>Mejorar cómo se transforma la materia prima en un producto terminado.</p></div>
+            <div><span className="eyebrow">ÁREA A</span><h3>Optimización productiva</h3><p>Controlamos cómo se transforma el insumo en producto.</p></div>
           </div>
           <div className="service-grid">
             {productiveServices.map((item, index) => <ServiceCard key={item.title} item={item} index={index} />)}
@@ -266,13 +366,13 @@ function ServicesSection() {
         <div className="service-group service-group-admin">
           <div className="service-group-heading">
             <div className="service-group-icon service-group-icon-orange"><Icon name="chart" size={24} /></div>
-            <div><span className="eyebrow">ÁREA B</span><h3>Gestión administrativa del negocio</h3><p>Entender los recursos, el dinero y la información que sostienen la producción.</p></div>
+            <div><span className="eyebrow">ÁREA B</span><h3>Gestión del negocio</h3><p>Ordenamos los recursos y datos que sostienen la producción.</p></div>
           </div>
           <div className="service-grid service-grid-admin">
             {adminServices.map((item, index) => <ServiceCard key={item.title} item={item} index={index} />)}
           </div>
         </div>
-        <div className="service-disclaimer"><Icon name="alert" size={18} /><p><strong>Implementación progresiva:</strong> los servicios se configuran según el diagnóstico y el alcance acordado. Algunas capacidades, como mantenimiento predictivo, visión artificial e integraciones especializadas, corresponden a fases posteriores; no se presentan como funcionalidades ya desplegadas.</p></div>
+        <div className="service-disclaimer"><Icon name="alert" size={18} /><p><strong>Implementación por etapas:</strong> definimos el alcance según el diagnóstico. IA predictiva y visión artificial requieren datos suficientes y se incorporan en fases posteriores.</p></div>
       </div>
     </section>
   );
@@ -286,12 +386,12 @@ function ChainSection() {
       <div className="container">
         <div className="section-heading">
           <span className="eyebrow">MÓDULO · CADENA DE VALOR</span>
-          <h2>Antes de automatizar, entendemos cómo produces.</h2>
-          <p>La cadena de valor describe las actividades que convierten insumos en productos y los hacen llegar al cliente. TECH BOOST analiza cada etapa para encontrar pérdidas, esperas y oportunidades de mejora.</p>
+          <h2>Primero entendemos cómo produces.</h2>
+          <p>Mapeamos etapas, insumos y tiempos para ubicar pérdidas y decidir qué mejorar o digitalizar.</p>
         </div>
         <div className="chain-context">
           <div className="chain-context-icon"><Icon name="factory" size={24} /></div>
-          <div><strong>Ejemplo de referencia: taller de calzado</strong><p>Las etapas pueden cambiar según el modelo, la maquinaria y la forma de trabajo de cada taller. No existe una secuencia única para todas las industrias.</p></div>
+          <div><strong>Ejemplo: taller de calzado</strong><p>Adaptamos el análisis al producto y a la forma de trabajo de cada empresa.</p></div>
         </div>
         <div className="chain-flow" aria-label="Etapas de la cadena de valor de un taller de calzado">
           {chainStages.map((item, index) => (
@@ -322,13 +422,13 @@ function ChainSection() {
           </div>
         </article>
         <div className="risk-section">
-          <div className="risk-heading"><span className="eyebrow">PUNTOS CRÍTICOS Y RIESGOS</span><h3>¿Dónde puede estar perdiendo dinero tu empresa?</h3><p>El diagnóstico busca reconocer los problemas que afectan el flujo de producción y relacionarlos con datos observables.</p></div>
+          <div className="risk-heading"><span className="eyebrow">PUNTOS CRÍTICOS</span><h3>¿Dónde se pierde tiempo o dinero?</h3><p>Buscamos causas observables para priorizar mejoras.</p></div>
           <div className="risk-grid">
             {riskItems.map(([title, detail], index) => <article className="risk-card" key={title}><span>{String(index + 1).padStart(2, "0")}</span><div><strong>{title}</strong><p>{detail}</p></div></article>)}
           </div>
         </div>
         <div className="chain-outcomes">
-          <div><span className="eyebrow eyebrow-light">RESULTADOS DEL ANÁLISIS</span><h3>De observar el proceso a proponer mejoras medibles.</h3></div>
+          <div><span className="eyebrow eyebrow-light">RESULTADOS</span><h3>Del diagnóstico a mejoras medibles.</h3></div>
           <ul>
             <li><Icon name="check" /> Identificación de cuellos de botella.</li>
             <li><Icon name="check" /> Detección de actividades que generan pérdidas.</li>
@@ -436,13 +536,12 @@ function AppContent() {
 
   return (
     <>
-      <Header financeActive={financeActive} />
-      {(financeActive || businessPanelActive || companiesActive || aiChatActive) && user && (
-        <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", gap: 14, padding: "12px 5%", background: "#f4f6f8" }}>
-          <span>{user.nombre} {user.apellido} · {user.rol}</span>
-          <button type="button" className="button button-outline" onClick={logout}>Cerrar sesión</button>
-        </div>
-      )}
+      <Header
+        financeActive={financeActive}
+        loading={loading}
+        user={user}
+        onLogout={logout}
+      />
       {businessPanelActive ? (
         loading ? (
           <p style={{ padding: 32 }}>Verificando sesión…</p>
@@ -505,6 +604,7 @@ function AppContent() {
         <>
           <Hero />
           <CompanySection />
+          <TransformationSection />
           <ServicesSection />
           <ChainSection />
           <Footer />

@@ -88,10 +88,19 @@ export function CompaniesPage({
               }}
             >
               <div>
-                <strong>{emp.razonSocial}</strong>
-                <div style={{ fontSize: 14, color: "#555" }}>
-                  Rubro: {emp.rubro} · Tamaño: {emp.tamano} ·{" "}
-                  {emp.departamento ?? "La Paz"}
+                <strong
+                  style={{
+                    display: "block",
+                    fontSize: 17,
+                    fontWeight: 700,
+                    color: "#0f2942",
+                    marginBottom: 4,
+                  }}
+                >
+                  {emp.razonSocial}
+                </strong>
+                <div style={{ fontSize: 14, color: "#1e3a5f", fontWeight: 500 }}>
+                  Rubro: {emp.rubro} · Tamaño: {emp.tamano} · {emp.departamento ?? "La Paz"}
                 </div>
               </div>
 
