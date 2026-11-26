@@ -23,7 +23,33 @@
 
 ## Description
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+API backend de TechBoost construido con NestJS, TypeORM y PostgreSQL. Las entidades corresponden al esquema de `scriptCreacionBd.sql`.
+
+## API de datos
+
+Cada recurso ofrece `GET /<recurso>` (lista paginada con cursor, máximo 100 registros por página; admite `?limit=` y `?after=<nextCursor>`), `GET /<recurso>/:id`, `POST /<recurso>`, `PATCH /<recurso>/:id` y `DELETE /<recurso>/:id`. El listado responde `{ "items": [...], "nextCursor": "..." }`; `nextCursor` es `null` al llegar al final. Los cuerpos aceptan propiedades en camelCase y rechazan campos desconocidos. Las claves primarias y campos generados no se pueden modificar; PostgreSQL aplica las restricciones de claves foráneas y valores permitidos.
+
+| Tabla | Recurso |
+| --- | --- |
+| `planes` | `/planes` |
+| `usuarios` | `/usuarios` |
+| `empresas` | `/empresas` |
+| `etapas_cadena_valor` | `/etapas-cadena-valor` |
+| `productos` | `/productos` |
+| `ordenes_produccion` | `/ordenes-produccion` |
+| `ejecucion_etapas_orden` | `/ejecucion-etapas-orden` |
+| `maquinarias` | `/maquinarias` |
+| `dispositivos_iot` | `/dispositivos-iot` |
+| `lecturas_iot` | `/lecturas-iot` |
+| `historial_mantenimientos` | `/historial-mantenimientos` |
+| `insumos` | `/insumos` |
+| `receta_producto_insumos` | `/receta-producto-insumos` |
+| `registros_operativos` | `/registros-operativos` |
+| `trabajadores` | `/trabajadores` |
+| `registros_destajo` | `/registros-destajo` |
+| `informes_analisis_ia` | `/informes-analisis-ia` |
+
+Estos endpoints aún no tienen autenticación ni autorización. Antes de exponerlos fuera de un entorno de desarrollo, se deben proteger especialmente las operaciones sobre usuarios, empresas y datos de producción.
 
 ## Project setup
 
