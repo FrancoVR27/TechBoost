@@ -25,4 +25,10 @@ export class Producto {
 
   @Column({ name: 'margen_ganancia_pct', type: 'numeric', precision: 5, scale: 2, nullable: true })
   margenGananciaPct!: string | null;
+
+  @Column({ name: 'costo_mano_obra_bs', type: 'numeric', precision: 10, scale: 2, default: 0 })
+  costoManoObraBs!: string;
+
+  @Column({ name: 'otros_costos_bs', type: 'numeric', precision: 10, scale: 2, default: 0 })
+  otrosCostosBs!: string;
 }
