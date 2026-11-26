@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { SyntheticEvent } from 'react'
 import { ApiError } from '../api.ts'
 import Brand from './Brand.tsx'
@@ -17,7 +17,12 @@ const MODULES: { name: string; code: string; on: boolean }[] = [
 ]
 
 export default function LoginPage() {
-  const { login, register } = useAuth()
+  const { login, register, user } = useAuth()
+  useEffect(() => {
+    if (user) {
+      window.location.hash = '#finanzas'
+    }
+  }, [user])
   const [mode, setMode] = useState<Mode>('login')
   const [nombre, setNombre] = useState('')
   const [apellido, setApellido] = useState('')
@@ -45,6 +50,7 @@ export default function LoginPage() {
         setError('La contraseña debe tener al menos 8 caracteres')
         return
       }
+
       if (contrasena !== confirmacion) {
         setError('Las contraseñas no coinciden')
         return
@@ -52,22 +58,31 @@ export default function LoginPage() {
     }
 
     setSubmitting(true)
+
     try {
-      if (isRegister) await register({ nombre, apellido, correo, contrasena })
-      else await login(correo, contrasena)
+      if (isRegister) {
+        await register({
+          nombre,
+          apellido,
+          correo,
+          contrasena,
+        })
+      } else {
+        await login(correo, contrasena)
+      }
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Error inesperado')
+      setError(
+        err instanceof ApiError
+          ? err.message
+          : 'No se pudo conectar con el servidor. Verifica tu conexión.'
+      )
+    } finally {
       setSubmitting(false)
     }
   }
 
   return (
     <>
-      <header className="top">
-        <div className="wrap">
-          <Brand />
-        </div>
-      </header>
 
       <main className="hero tb-login">
         <div className="wrap">

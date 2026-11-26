@@ -1,78 +1,9 @@
-<<<<<<< HEAD
-import { AuthProvider } from './auth/AuthProvider.tsx'
-import Brand from './auth/Brand.tsx'
-import LoginPage from './auth/LoginPage.tsx'
-import { useAuth } from './auth/useAuth.ts'
-import './auth/auth.css'
-
-const PANELS = [
-  { code: 'A1', name: 'Finanzas y flujo de caja' },
-  { code: 'A2', name: 'Costos por producto' },
-  { code: 'A3', name: 'Personal y trabajo a destajo' },
-  { code: 'A4', name: 'Marketing e inteligencia de mercados' },
-]
-
-function Shell() {
-  const { user, loading, logout } = useAuth()
-
-  if (loading) {
-    return <p style={{ padding: 32 }}>Cargando…</p>
-  }
-  if (!user) {
-    return <LoginPage />
-  }
-
-  // Panel provisional: aquí irán los módulos financiero, marketing/BI y RR.HH.
-  return (
-    <>
-      <header className="top">
-        <div className="wrap">
-          <Brand />
-          <div className="tb-who">
-            <span>
-              {user.nombre} {user.apellido}
-            </span>
-            <span className="mono">{user.rol}</span>
-            <button type="button" className="btn btn-line btn-sm" onClick={logout}>
-              Cerrar sesión
-            </button>
-          </div>
-        </div>
-      </header>
-
-      <section className="hero tb-dash">
-        <div className="wrap">
-          <span className="eyebrow">Panel de tu negocio</span>
-          <h1>Hola, {user.nombre}.</h1>
-          <p className="lead">Tu cuenta está en estado «{user.estado}». Pronto verás aquí tus módulos activos.</p>
-        </div>
-      </section>
-
-      <main className="wrap tb-mods">
-        <h2>Módulos</h2>
-        <p className="lead">Estos serán los primeros paneles disponibles.</p>
-        <div className="tile-grid">
-          {PANELS.map((p) => (
-            <div key={p.code} className="tile">
-              <span className="code">{p.code}</span>
-              <span>{p.name}</span>
-              <span className="pill">Próximamente</span>
-            </div>
-          ))}
-        </div>
-      </main>
-    </>
-  )
-}
-
-export default function App() {
-  return (
-    <AuthProvider>
-      <Shell />
-    </AuthProvider>
-  )
-=======
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useState } from "react";
+import { AuthProvider } from "./auth/AuthProvider";
+import LoginPage from "./auth/LoginPage";
+import Brand from "./auth/Brand";
+import { useAuth } from "./auth/useAuth";
+import "./auth/auth.css";
 import { chainStages } from "./data/chainStages";
 import { FinanceDemo } from "./components/FinanceDemo";
 import { Icon } from "./components/Icon";
@@ -161,15 +92,6 @@ const riskItems = [
   ["Mala planificación de pedidos", "Organizar órdenes y capacidad por etapa para programar lotes y fechas de entrega."],
 ];
 
-function Brand() {
-  return (
-    <a className="brand" href="#inicio" aria-label="TECH BOOST, inicio">
-      <span className="brand-mark"><img src="/techboost-logo.png" alt="" /></span>
-      <span className="brand-name">TECH<span>BOOST</span><small>Transformación inteligente de industrias</small></span>
-    </a>
-  );
-}
-
 function Header({ financeActive }: { financeActive: boolean }) {
   return (
     <header className="site-header">
@@ -182,7 +104,7 @@ function Header({ financeActive }: { financeActive: boolean }) {
           <a href="#cadena">Cadena de valor</a>
           <a href="#finanzas" className="nav-finance"><Icon name="lock" size={14} /> Finanzas</a>
         </nav>
-        <a className="button button-small button-primary header-cta" href="#diagnostico">Solicitar diagnóstico <Icon name="arrow" size={15} /></a>
+        <a className="button button-small button-primary header-cta" href="#login">Iniciar sesión <Icon name="arrow" size={15} /></a>
       </div>
     </header>
   );
@@ -199,7 +121,7 @@ function Hero() {
           <h1>Tu producción puede funcionar <em>mejor.</em></h1>
           <p className="hero-lead">Ayudamos a micro, pequeñas y medianas empresas productivas a ordenar sus procesos, reducir pérdidas y tomar decisiones con información clara.</p>
           <div className="hero-actions">
-            <a className="button button-primary" href="#diagnostico">Solicitar diagnóstico <Icon name="arrow" size={17} /></a>
+            <a className="button button-primary" href="#login">Iniciar sesión <Icon name="arrow" size={17} /></a>
             <a className="button button-ghost" href="#cadena">Conocer cómo trabajamos</a>
           </div>
           <div className="hero-proof">
@@ -405,93 +327,13 @@ function ChainSection() {
   );
 }
 
-function DiagnosticSection() {
-  const [name, setName] = useState("");
-  const [business, setBusiness] = useState("");
-  const [industry, setIndustry] = useState("Calzado");
-  const [city, setCity] = useState("La Paz");
-  const [challenge, setChallenge] = useState("Conocer el costo real de producción");
-  const [preparedRequest, setPreparedRequest] = useState("");
-  const [copied, setCopied] = useState(false);
-
-  function prepareRequest(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const message = [
-      "SOLICITUD DE DIAGNÓSTICO · TECH BOOST",
-      `Nombre: ${name.trim()}`,
-      `Empresa: ${business.trim()}`,
-      `Rubro: ${industry}`,
-      `Ciudad: ${city.trim()}`,
-      `Principal necesidad: ${challenge}`,
-      "",
-      "Quisiera conocer cómo TECH BOOST puede ayudar a mejorar mi negocio.",
-    ].join("\n");
-    setPreparedRequest(message);
-    setCopied(false);
-  }
-
-  async function copyRequest() {
-    try {
-      await navigator.clipboard.writeText(preparedRequest);
-      setCopied(true);
-    } catch {
-      setCopied(false);
-    }
-  }
-
-  return (
-    <section className="diagnostic-section" id="diagnostico">
-      <div className="container diagnostic-layout">
-        <div className="diagnostic-copy">
-          <span className="eyebrow eyebrow-light">PRIMER PASO</span>
-          <h2>Conversemos sobre cómo funciona tu negocio.</h2>
-          <p>Solicita un diagnóstico para revisar tu proceso productivo, conocer tus principales dificultades y evaluar qué herramientas podrían ayudarte.</p>
-          <div className="diagnostic-points">
-            <div><Icon name="check" /><span>Empezamos por tu proceso, no por venderte un sistema.</span></div>
-            <div><Icon name="check" /><span>Revisamos tus necesidades y recursos actuales.</span></div>
-            <div><Icon name="check" /><span>Proponemos mejoras de forma progresiva.</span></div>
-          </div>
-        </div>
-        <div className="diagnostic-form-card">
-          {!preparedRequest ? (
-            <>
-              <div className="diagnostic-form-heading"><span className="form-step">DIAGNÓSTICO INICIAL</span><h3>Cuéntanos lo esencial.</h3><p>Solo necesitamos algunos datos para entender tu solicitud.</p></div>
-              <form onSubmit={prepareRequest}>
-                <label>Tu nombre<input required value={name} onChange={(event) => setName(event.target.value)} placeholder="Nombre y apellido" /></label>
-                <label>Nombre de tu empresa o taller<input required value={business} onChange={(event) => setBusiness(event.target.value)} placeholder="Ej. Taller de calzados" /></label>
-                <div className="diagnostic-form-row">
-                  <label>Rubro<select value={industry} onChange={(event) => setIndustry(event.target.value)}><option>Calzado</option><option>Textil y confecciones</option><option>Sastrería</option><option>Metalmecánica</option><option>Alimentos y bebidas</option><option>Otro rubro productivo</option></select></label>
-                  <label>Ciudad<input required value={city} onChange={(event) => setCity(event.target.value)} /></label>
-                </div>
-                <label>¿Qué te preocupa más?<select value={challenge} onChange={(event) => setChallenge(event.target.value)}><option>Conocer el costo real de producción</option><option>Reducir desperdicio de materiales</option><option>Organizar y planificar la producción</option><option>Controlar inventarios y compras</option><option>Evitar paradas de maquinaria</option><option>Mejorar la calidad del producto</option><option>Ordenar ingresos, egresos y flujo de caja</option></select></label>
-                <button className="button button-primary button-wide" type="submit">Preparar mi solicitud <Icon name="arrow" size={17} /></button>
-              </form>
-              <p className="form-privacy"><Icon name="shield" size={14} /> Estos datos solo se utilizan en esta página para preparar el texto; no se envían ni se almacenan en el servidor.</p>
-            </>
-          ) : (
-            <div className="request-ready">
-              <div className="request-check"><Icon name="check" size={25} /></div>
-              <span className="eyebrow">SOLICITUD PREPARADA</span>
-              <h3>Tu diagnóstico está listo para compartir.</h3>
-              <pre>{preparedRequest}</pre>
-              <button className="button button-primary button-wide" type="button" onClick={copyRequest}><Icon name="download" size={17} /> {copied ? "Solicitud copiada" : "Copiar solicitud"}</button>
-              <p className="form-privacy">Aviso: el repositorio actual todavía no cuenta con un endpoint para recibir y almacenar solicitudes. Copiar el texto no lo envía automáticamente a TECH BOOST.</p>
-              <button className="text-button" type="button" onClick={() => setPreparedRequest("")}>Editar mis datos</button>
-            </div>
-          )}
-        </div>
-      </div>
-    </section>
-  );
-}
-
 function Footer() {
   return (
     <footer className="site-footer">
       <div className="container footer-main">
         <div><Brand /><p>Automatización, inteligencia artificial y análisis de datos para modernizar negocios productivos.</p></div>
         <div className="footer-links"><span>EXPLORA</span><a href="#empresa">La empresa</a><a href="#servicios">Servicios</a><a href="#cadena">Cadena de valor</a><a href="#finanzas">Área financiera</a></div>
-        <div className="footer-note"><span>ENFOQUE</span><p>La Paz, Bolivia<br />Micro, pequeñas y medianas empresas productivas.</p><a href="#diagnostico">Solicitar diagnóstico <Icon name="arrow" size={14} /></a></div>
+        <div className="footer-note"><span>ENFOQUE</span><p>La Paz, Bolivia<br />Micro, pequeñas y medianas empresas productivas.</p><a href="#login">Iniciar sesión <Icon name="arrow" size={14} /></a></div>
       </div>
       <div className="container footer-bottom"><span>TECH BOOST BOLIVIA</span><span>«Transformación inteligente de industrias»</span><span>Proyecto de emprendimiento · 2026</span></div>
     </footer>
@@ -505,8 +347,8 @@ function FinanceAccessGate({ onDemo }: { onDemo: () => void }) {
         <div className="gate-lock"><Icon name="lock" size={27} /></div>
         <span className="eyebrow">ÁREA PRIVADA</span>
         <h1>Finanzas de tu empresa.</h1>
-        <p>El panel financiero está diseñado para que cada cliente consulte únicamente la información de su propia empresa. El acceso real requiere autenticación, rol Cliente o Admin y autorización verificada en el servidor.</p>
-        <div className="gate-status"><span className="status-dot" /><div><strong>Integración de autenticación pendiente</strong><small>El repositorio recibido todavía no incluye login, roles ni endpoints financieros.</small></div></div>
+        <p>Has iniciado sesión. El panel financiero debe mostrar únicamente la información autorizada para tu cuenta. La validación definitiva de roles y permisos debe realizarse también en el servidor.</p>
+        <div className="gate-status"><span className="status-dot" /><div><strong>Sesión autenticada</strong><small>Acceso protegido por el sistema de autenticación de TECH BOOST.</small></div></div>
         <button className="button button-primary button-wide" type="button" onClick={onDemo}>Ver demostración con datos ficticios <Icon name="arrow" size={16} /></button>
         <a className="text-button gate-back" href="#inicio">Volver a la presentación pública</a>
       </div>
@@ -515,16 +357,19 @@ function FinanceAccessGate({ onDemo }: { onDemo: () => void }) {
   );
 }
 
-export default function App() {
+function AppContent() {
+  const { user, loading, logout } = useAuth();
   const [financeActive, setFinanceActive] = useState(window.location.hash === "#finanzas");
+  const [loginActive, setLoginActive] = useState(window.location.hash === "#login");
   const [demoActive, setDemoActive] = useState(false);
 
   useEffect(() => {
     const handleHash = () => {
       const hash = window.location.hash;
       setFinanceActive(hash === "#finanzas");
+      setLoginActive(hash === "#login");
       setDemoActive(false);
-      if (hash && hash !== "#finanzas") {
+      if (hash && hash !== "#finanzas" && hash !== "#login") {
         window.setTimeout(() => {
           document.getElementById(hash.slice(1))?.scrollIntoView({ behavior: "smooth", block: "start" });
         }, 80);
@@ -533,7 +378,7 @@ export default function App() {
       }
     };
     window.addEventListener("hashchange", handleHash);
-    if (window.location.hash && window.location.hash !== "#finanzas") {
+    if (window.location.hash && window.location.hash !== "#finanzas" && window.location.hash !== "#login") {
       const target = document.getElementById(window.location.hash.slice(1));
       if (target) window.setTimeout(() => target.scrollIntoView({ behavior: "smooth", block: "start" }), 100);
     }
@@ -542,6 +387,7 @@ export default function App() {
 
   function exitFinance() {
     setFinanceActive(false);
+    setLoginActive(false);
     setDemoActive(false);
     window.location.hash = "#inicio";
   }
@@ -549,19 +395,37 @@ export default function App() {
   return (
     <>
       <Header financeActive={financeActive} />
+      {financeActive && user && (
+        <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", gap: 14, padding: "12px 5%", background: "#f4f6f8" }}>
+          <span>{user.nombre} {user.apellido} · {user.rol}</span>
+          <button type="button" className="button button-outline" onClick={logout}>Cerrar sesión</button>
+        </div>
+      )}
       {financeActive ? (
-        demoActive ? <FinanceDemo onExit={exitFinance} /> : <FinanceAccessGate onDemo={() => setDemoActive(true)} />
+        loading ? <p style={{ padding: 32 }}>Verificando sesión…</p>
+          : !user ? <LoginPage />
+          : demoActive ? <FinanceDemo onExit={exitFinance} /> : <FinanceAccessGate onDemo={() => setDemoActive(true)} />
+      ) : loginActive ? (
+        <main className="login-route">
+          <LoginPage />
+        </main>
       ) : (
         <>
           <Hero />
           <CompanySection />
           <ServicesSection />
           <ChainSection />
-          <DiagnosticSection />
           <Footer />
         </>
       )}
     </>
   );
->>>>>>> 05bfc1bad650201ddbab20bfb00ef93acbe48697
+}
+
+export default function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
+  );
 }
