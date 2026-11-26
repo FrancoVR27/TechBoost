@@ -5,6 +5,7 @@ import { AppController } from './app.controller.js';
 import { AuthModule } from './auth/auth.module.js';
 import { DatabaseApiModule } from './database-api.module.js';
 import { IaPredictivaModule } from './ia-predictiva/ia-predictiva.module.js';
+import { FinanceModule } from './finance/finance.module.js';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { IaPredictivaModule } from './ia-predictiva/ia-predictiva.module.js';
     AuthModule,
     DatabaseApiModule,
     IaPredictivaModule,
+    FinanceModule,
   ],
 
   controllers: [AppController],

@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import type { SyntheticEvent } from 'react'
 import { ApiError } from '../api.ts'
-import Brand from './Brand.tsx'
 import { useAuth } from './useAuth.ts'
 import './auth.css'
 
