@@ -17,6 +17,7 @@ import { RegistrosOperativosModule } from './registros-operativos/registros-oper
 import { TrabajadoresModule } from './trabajadores/trabajadores.module.js';
 import { UsuariosModule } from './usuarios/usuarios.module.js';
 import { CostosProductosModule } from './costos-productos/costos-productos.module.js';
+import { MarketingModule } from './marketing/marketing.module.js';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { CostosProductosModule } from './costos-productos/costos-productos.modul
     RegistrosDestajoModule,
     InformesAnalisisIaModule,
     CostosProductosModule,
+    MarketingModule,
   ],
 })
 export class DatabaseApiModule {}

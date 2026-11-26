@@ -3,6 +3,7 @@ import TrabajadorForm from './components/TrabajadorForm';
 import MovimientoForm from './components/MovimientoForm';
 import DestajoPanel from './components/DestajoPanel';
 import { useEffect, useMemo, useState } from 'react';
+import MarketingPanel from './components/MarketingPanel';
 import './App.css';
 
 import {
@@ -43,7 +44,7 @@ function App() {
   const [trabajadorMovimiento, setTrabajadorMovimiento] =
     useState<Trabajador | null>(null);
 
-  const [seccionActiva, setSeccionActiva] = useState<'recursos-humanos' | 'planes-costos'>('recursos-humanos');
+  const [seccionActiva, setSeccionActiva] = useState<'recursos-humanos' | 'planes-costos' | 'marketing'>('recursos-humanos');
 
 
   async function cargarTrabajadores() {
@@ -157,10 +158,14 @@ function App() {
             Recursos Humanos
           </button>
 
-          <div className="sidebar-item disabled">
+          <button
+            type="button"
+            className={`sidebar-item ${seccionActiva === 'marketing' ? 'active' : ''}`}
+            onClick={() => setSeccionActiva('marketing')}
+          >
             <span className="sidebar-icon">◈</span>
             Marketing
-          </div>
+          </button>
 
           <button
             type="button"
@@ -405,6 +410,8 @@ function App() {
         )}
 
         {seccionActiva === 'planes-costos' && <PlanesCostosPanel />}
+        {seccionActiva === 'marketing' && <MarketingPanel />}
+
       </main>
 
       {trabajadorSeleccionado && (
