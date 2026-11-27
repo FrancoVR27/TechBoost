@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import type { SyntheticEvent } from 'react'
-import { ApiError } from '../api.ts'
+import { ApiError, apiFetch } from '../api.ts'
 import { useAuth } from './useAuth.ts'
 import './auth.css'
 
@@ -18,9 +18,24 @@ const MODULES: { name: string; code: string; on: boolean }[] = [
 export default function LoginPage() {
   const { login, register, user } = useAuth()
   useEffect(() => {
-    if (user) {
-      window.location.hash = '#finanzas'
+    if (!user) return
+
+    let active = true
+    // Si la cuenta aún no tiene empresa, primero completa el registro empresarial.
+    if (user.rol === 'Admin') {
+      window.location.hash = '#empresas'
+      return
     }
+
+    apiFetch<{ items: unknown[] }>('/empresas')
+      .then(({ items }) => {
+        if (active) window.location.hash = items.length > 0 ? '#finanzas' : '#empresas'
+      })
+      .catch(() => {
+        if (active) window.location.hash = '#empresas'
+      })
+
+    return () => { active = false }
   }, [user])
   const [mode, setMode] = useState<Mode>('login')
   const [nombre, setNombre] = useState('')

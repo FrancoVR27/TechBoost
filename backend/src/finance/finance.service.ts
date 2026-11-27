@@ -315,6 +315,10 @@ export class FinanceService {
   async getReport(usuarioId: string, period?: string, openingBalance = 0): Promise<FinanceReport> {
     const range = parsePeriod(period);
     if (!range) throw new BadRequestException('El periodo debe tener formato YYYY-MM');
+    const empresa = await this.resolveEmpresa(usuarioId);
+    if (!empresa) {
+      throw new NotFoundException('Tu cuenta todavía no tiene una empresa vinculada. Entra a Empresas y registra tu negocio.');
+    }
     const movements = await this.listMovements(usuarioId, range.period);
     const overview = await this.getOverview(usuarioId, range.period, openingBalance);
     const destajos = await this.getDestajos(usuarioId, range.period);

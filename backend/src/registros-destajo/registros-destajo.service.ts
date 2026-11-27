@@ -8,6 +8,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
 import { CrudService } from '../common/crud.service.js';
 import { Trabajador } from '../trabajadores/trabajador.entity.js';
+import { Empresa } from '../empresas/empresas.entity.js';
 import { RegistroOperativo } from '../registros-operativos/registro-operativo.entity.js';
 import type { RegistrarDestajoDto, FiltrosDestajoDto } from './dto/registrar-destajo.dto.js';
 import { RegistroDestajo } from './registro-destajo.entity.js';
@@ -19,12 +20,14 @@ export class RegistrosDestajoService extends CrudService<RegistroDestajo> {
     repository: Repository<RegistroDestajo>,
     @InjectRepository(Trabajador)
     private readonly trabajadoresRepository: Repository<Trabajador>,
+    @InjectRepository(Empresa)
+    private readonly empresasRepository: Repository<Empresa>,
     private readonly dataSource: DataSource,
   ) {
     super(repository);
   }
 
-  async registrar(datos: RegistrarDestajoDto) {
+  async registrar(datos: RegistrarDestajoDto, usuarioId: string, rol: string) {
     if (!datos || typeof datos !== 'object' || Array.isArray(datos)) {
       throw new BadRequestException('Debes enviar los datos del trabajo realizado');
     }
@@ -69,6 +72,7 @@ export class RegistrosDestajoService extends CrudService<RegistroDestajo> {
     if (!trabajador) {
       throw new NotFoundException('El trabajador seleccionado no existe');
     }
+    await this.verificarAccesoEmpresa(trabajador.empresaId, usuarioId, rol);
     if (trabajador.activo !== true) {
       throw new BadRequestException('No se puede registrar producción a un trabajador inactivo');
     }
@@ -92,8 +96,10 @@ export class RegistrosDestajoService extends CrudService<RegistroDestajo> {
     return this.repository.save(registro);
   }
 
-  async listar(filtros: FiltrosDestajoDto) {
-    this.validarFiltros(filtros);
+  async listar(filtros: FiltrosDestajoDto, usuarioId: string, rol: string) {
+    const empresaId = await this.empresaAutorizada(filtros.empresaId, usuarioId, rol);
+    const filtrosAutorizados = { ...filtros, empresaId };
+    this.validarFiltros(filtrosAutorizados);
 
     const query = this.repository
       .createQueryBuilder('registro')
@@ -114,28 +120,26 @@ export class RegistrosDestajoService extends CrudService<RegistroDestajo> {
       .addSelect('registro.pagado', 'pagado')
       .addSelect('registro.fechaPago', 'fechaPago')
       .addSelect('registro.fechaRegistro', 'fechaRegistro')
-      .where('trabajador.empresa_id = :empresaId', {
-        empresaId: filtros.empresaId,
-      });
+      .where('trabajador.empresa_id = :empresaId', { empresaId });
 
-    if (filtros.trabajadorId) {
+    if (filtrosAutorizados.trabajadorId) {
       query.andWhere('registro.trabajadorId = :trabajadorId', {
-        trabajadorId: filtros.trabajadorId,
+        trabajadorId: filtrosAutorizados.trabajadorId,
       });
     }
-    if (filtros.desde) {
+    if (filtrosAutorizados.desde) {
       query.andWhere('registro.fechaTrabajo >= :desde', {
-        desde: filtros.desde,
+        desde: filtrosAutorizados.desde,
       });
     }
-    if (filtros.hasta) {
+    if (filtrosAutorizados.hasta) {
       query.andWhere('registro.fechaTrabajo <= :hasta', {
-        hasta: filtros.hasta,
+        hasta: filtrosAutorizados.hasta,
       });
     }
-    if (filtros.pagado === 'true') {
+    if (filtrosAutorizados.pagado === 'true') {
       query.andWhere('registro.pagado = TRUE');
-    } else if (filtros.pagado === 'false') {
+    } else if (filtrosAutorizados.pagado === 'false') {
       query.andWhere('registro.pagado = FALSE');
     }
 
@@ -161,10 +165,8 @@ export class RegistrosDestajoService extends CrudService<RegistroDestajo> {
     }));
   }
 
-  async resumen(empresaId: string, desde?: string, hasta?: string) {
-    if (!this.uuidValido(empresaId)) {
-      throw new BadRequestException('Selecciona una empresa válida');
-    }
+  async resumen(empresaIdSolicitada: string, desde: string | undefined, hasta: string | undefined, usuarioId: string, rol: string) {
+    const empresaId = await this.empresaAutorizada(empresaIdSolicitada, usuarioId, rol);
     if (desde && !this.fechaValida(desde)) {
       throw new BadRequestException('La fecha inicial no es válida');
     }
@@ -240,7 +242,7 @@ export class RegistrosDestajoService extends CrudService<RegistroDestajo> {
     return { totales, trabajadores };
   }
 
-  async marcarPagado(destajoId: string) {
+  async marcarPagado(destajoId: string, usuarioId: string, rol: string) {
     if (!this.uuidValido(destajoId)) {
       throw new BadRequestException('El identificador del registro no es válido');
     }
@@ -267,6 +269,7 @@ export class RegistrosDestajoService extends CrudService<RegistroDestajo> {
       if (!trabajador) {
         throw new NotFoundException('No se encontró el trabajador asociado');
       }
+      await this.verificarAccesoEmpresa(trabajador.empresaId, usuarioId, rol);
 
       registro.pagado = true;
       registro.fechaPago = new Date();
@@ -290,6 +293,29 @@ export class RegistrosDestajoService extends CrudService<RegistroDestajo> {
 
       return registro;
     });
+  }
+
+  private async empresaAutorizada(empresaSolicitada: string, usuarioId: string, rol: string): Promise<string> {
+    if (rol === 'Admin') {
+      if (!this.uuidValido(empresaSolicitada)) {
+        throw new BadRequestException('Selecciona una empresa válida');
+      }
+      const empresa = await this.empresasRepository.findOneBy({ empresaId: empresaSolicitada });
+      if (!empresa) throw new NotFoundException('La empresa seleccionada no existe');
+      return empresa.empresaId;
+    }
+
+    const empresa = await this.empresasRepository.findOneBy({ clienteId: usuarioId });
+    if (!empresa) throw new NotFoundException('Tu cuenta todavía no tiene una empresa vinculada. Regístrala en Empresas.');
+    return empresa.empresaId;
+  }
+
+  private async verificarAccesoEmpresa(empresaId: string, usuarioId: string, rol: string): Promise<void> {
+    if (rol === 'Admin') return;
+    const empresa = await this.empresasRepository.findOneBy({ clienteId: usuarioId });
+    if (!empresa || empresa.empresaId !== empresaId) {
+      throw new NotFoundException('El registro no existe en tu empresa.');
+    }
   }
 
   private validarFiltros(filtros: FiltrosDestajoDto) {
